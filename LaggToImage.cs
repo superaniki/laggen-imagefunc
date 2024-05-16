@@ -1,20 +1,7 @@
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Drawing;
-using SixLabors.ImageSharp.Drawing.Processing;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
-using SixLabors.Fonts;
-using System.Net.Http.Json;
-using System.Text.Json;
-using Newtonsoft.Json;
-
 
 namespace SuperAniki.Laggen
 {
@@ -58,7 +45,7 @@ namespace SuperAniki.Laggen
             /* Create image from class object */
             try
             {
-                Stream? imageStream = DrawPaper(barrelData, logger);
+                Stream? imageStream = Paper.DrawPaper(barrelData, logger);
                 if (imageStream == null)
                 {
                     var errorResponse = req.CreateResponse(System.Net.HttpStatusCode.InternalServerError);
@@ -87,59 +74,6 @@ namespace SuperAniki.Laggen
             return errorResponse;
         }
 
-
-        private static MemoryStream? DrawPaper(BarrelForPrintouts barrel, ILogger logger)
-        {
-            FontCollection collection = new();
-            StaveTool toolState = barrel.StaveToolState;
-            try
-            {
-                //https://github.com/shantigilbert/liberation-fonts-ttf/blob/master/LiberationMono-Regular.ttf
-                collection.Add("fonts/LiberationMono-Regular.ttf");
-            }
-            catch (Exception e)
-            {
-                logger.LogError("Font loading exception: " + e.Message);
-            }
-
-
-            //var fontPath = Path.Combine(context.FunctionAppDirectory, fFonts", "MyFont.ttf");
-            //var path = System.IO.Path.Combine(context.FunctionDirectory, "twinkle.txt");
-
-            int width = 640;
-            int height = 480;
-            using (Image<Rgba32> image = new(width, height))
-            {
-
-                if (collection.TryGet("Liberation Mono", out FontFamily family))
-                {
-                    // family will not be null here
-                    Font font = family.CreateFont(12, FontStyle.Italic);
-                    string detailsName = barrel.BarrelDetails.Name;
-                    image.Mutate(x => x.DrawText(detailsName, font, Color.Black, new PointF(10, 10)));
-                }
-
-                MemoryStream memoryStream = new();
-                image.SaveAsPng(memoryStream);
-                memoryStream.Seek(0, SeekOrigin.Begin);
-                return memoryStream;
-            }
-        }
-        static MemoryStream DrawStar()
-        {
-            int width = 640;
-            int height = 480;
-            using (Image<Rgba32> image = new(width, height))
-            {
-                Star star = new(x: width / 2, y: height / 2, prongs: 5, innerRadii: 15.0f, outerRadii: 30.0f, 0.5f);
-                image.Mutate(x => x.Fill(Color.Red, star)); // fill the star with red
-
-                MemoryStream memoryStream = new();
-                image.SaveAsPng(memoryStream);
-                memoryStream.Seek(0, SeekOrigin.Begin);
-                return memoryStream;
-            }
-        }
     }
 }
 
