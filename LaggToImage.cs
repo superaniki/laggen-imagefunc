@@ -41,11 +41,12 @@ namespace SuperAniki.Laggen
                 return await ReturnErrorMessage(req, logger, result.ErrorMessage!);
             }
             barrelData = result.Data!;
+            int scale = 6;
 
             /* Create image from class object */
             try
             {
-                Stream? imageStream = Paper.DrawPaper(barrelData, logger);
+                Stream? imageStream = Paper.Draw(barrelData, scale, logger);
                 if (imageStream == null)
                 {
                     var errorResponse = req.CreateResponse(System.Net.HttpStatusCode.InternalServerError);
@@ -56,7 +57,7 @@ namespace SuperAniki.Laggen
                 okResponse.Headers.Add("Content-Type", "image/png");
 
                 await imageStream.CopyToAsync(okResponse.Body);
-                logger.LogError("image ok. response comming:");
+                logger.LogError("image ok. response coming:");
 
                 return okResponse;
             }

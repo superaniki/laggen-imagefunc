@@ -77,7 +77,23 @@ namespace SuperAniki.Laggen
         public string? BarrelId { get; set; }
     }
 
-    public class StaveCurveConfig
+    public interface IStaveConfig
+    {
+        public string? Id { set; get; }
+        public string? DefaultPaperType { set; get; }
+        public string? BarrelId { set; get; }
+        // public IConfigDetails[]? ConfigDetails { get; set; }
+    }
+
+
+    public interface IConfigDetails
+    {
+        public string? Id { get; set; }
+        public string? PaperType { get; set; }
+        public bool RotatePaper { get; set; }
+    }
+
+    public class StaveCurveConfig : IStaveConfig
     {
         [JsonProperty("id")]
         public string? Id { get; set; }
@@ -89,10 +105,10 @@ namespace SuperAniki.Laggen
         public string? BarrelId { get; set; }
 
         [JsonProperty("configDetails")]
-        public StaveCurveConfigConfigDetail[]? ConfigDetails { get; set; }
+        public StaveCurveConfigDetail[]? ConfigDetails { get; set; }
     }
 
-    public class StaveCurveConfigConfigDetail
+    public class StaveCurveConfigDetail : IConfigDetails
     {
         [JsonProperty("id")]
         public string? Id { get; set; }
@@ -149,7 +165,7 @@ namespace SuperAniki.Laggen
         public string? StaveCurveConfigId { get; set; }
     }
 
-    public class StaveEndConfig
+    public class StaveEndConfig : IStaveConfig
     {
         [JsonProperty("id")]
         public string? Id { get; set; }
@@ -161,10 +177,10 @@ namespace SuperAniki.Laggen
         public string? BarrelId { get; set; }
 
         [JsonProperty("configDetails")]
-        public StaveEndConfigConfigDetail[]? ConfigDetails { get; set; }
+        public StaveEndConfigDetail[]? ConfigDetails { get; set; }
     }
 
-    public class StaveEndConfigConfigDetail
+    public class StaveEndConfigDetail : IConfigDetails
     {
         [JsonProperty("id")]
         public string? Id { get; set; }
@@ -185,7 +201,7 @@ namespace SuperAniki.Laggen
         public string? StaveEndConfigId { get; set; }
     }
 
-    public class StaveFrontConfig
+    public class StaveFrontConfig : IStaveConfig
     {
         [JsonProperty("id")]
         public string? Id { get; set; }
@@ -197,10 +213,10 @@ namespace SuperAniki.Laggen
         public string? BarrelId { get; set; }
 
         [JsonProperty("configDetails")]
-        public StaveFrontConfigConfigDetail[]? ConfigDetails { get; set; }
+        public StaveFrontConfigDetail[]? ConfigDetails { get; set; }
     }
 
-    public class StaveFrontConfigConfigDetail
+    public class StaveFrontConfigDetail : IConfigDetails
     {
         [JsonProperty("id")]
         public string? Id { get; set; }

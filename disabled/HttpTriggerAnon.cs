@@ -1,3 +1,4 @@
+#if !DISABLE_FUNCTION
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
@@ -56,3 +57,4 @@ namespace SuperAniki.Laggen
         }
     }
 }
+#endif

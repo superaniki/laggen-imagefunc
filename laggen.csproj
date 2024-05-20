@@ -19,6 +19,8 @@
     <PackageReference Include="SixLabors.Fonts" Version="2.0.3" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.4" />
     <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.2" />
+    <PackageReference Include="SkiaSharp" Version="2.88.8" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="2.88.8" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\LiberationMono-Regular.ttf">
@@ -38,4 +40,7 @@
   <ItemGroup>
     <Using Include="System.Threading.ExecutionContext" Alias="ExecutionContext" />
   </ItemGroup>
+  <PropertyGroup>
+    <DefineConstants>DISABLE_FUNCTION</DefineConstants>
+  </PropertyGroup>
 </Project>
