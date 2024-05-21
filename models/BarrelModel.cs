@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 
-namespace SuperAniki.Laggen
+namespace SuperAniki.Laggen.Models
 {
     public enum StaveTool
     {
@@ -11,7 +11,7 @@ namespace SuperAniki.Laggen
         Front,
         End
     }
-    public class BarrelForPrintouts
+    public class BarrelModel
     {
         [JsonProperty("staveToolState")]
         public StaveTool StaveToolState { get; set; }

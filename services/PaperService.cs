@@ -7,10 +7,11 @@ using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using Microsoft.Extensions.Logging;
 using SkiaSharp;
+using SuperAniki.Laggen.Models;
 
-namespace SuperAniki.Laggen
+namespace SuperAniki.Laggen.Services
 {
-  public static class Paper
+  public static class PaperService
   {
 
     // Define the dictionary to map Paper enum values to their corresponding sizes
@@ -20,7 +21,7 @@ namespace SuperAniki.Laggen
             { "A4", [210, 297] }
         };
 
-    private static bool GetPaperType(StaveTool type, BarrelForPrintouts barrel, out string paperType)
+    private static bool GetPaperType(StaveTool type, BarrelModel barrel, out string paperType)
     {
       switch (type)
       {
@@ -38,66 +39,66 @@ namespace SuperAniki.Laggen
           return false;
       }
     }
-
-    public static MemoryStream? Draw_ImageSharp(BarrelForPrintouts barrel, float scale, ILogger logger)
-    {
-      StaveTool toolState = barrel.StaveToolState;
-
-      FontCollection collection = new();
-      try
-      {
-        //https://github.com/shantigilbert/liberation-fonts-ttf/blob/master/LiberationMono-Regular.ttf
-        collection.Add("fonts/LiberationMono-Regular.ttf");
-      }
-      catch (Exception e)
-      {
-        logger.LogError("Font loading exception: " + e.Message);
-      }
-
-      //IStaveConfig? config;
-      string paperType;
-      if (!GetPaperType(toolState, barrel, out paperType))
-      {
-        logger.LogError("error finding paper size");
-      }
-      //return DrawErrorMessage(collection, "error finding paper size");
-
-      int[] paperSize = PaperSizes[paperType];
-
-
-      int width = paperSize[0];
-      int height = paperSize[1];
-
-      using (Image<Rgba32> image = new(width, height))
-      {
-        if (collection.TryGet("Liberation Mono", out FontFamily family))
+    /*
+        public static MemoryStream? Draw_ImageSharp(BarrelForPrintouts barrel, float scale, ILogger logger)
         {
-          // family will not be null here
-          Font font = family.CreateFont(12, FontStyle.Italic);
-          string detailsName = barrel.BarrelDetails.Name;
-          //Pen p = new Pen()
-          var points = new PointF[4];
-          points[0] = new PointF(x: 0, y: 0);
-          points[1] = new PointF(x: width - 1, y: 0);
-          points[2] = new PointF(x: width - 1, y: height - 1);
-          points[3] = new PointF(x: 0, y: height - 1);
-          //PatternPen pen = Pens.DashDot(Color.Green, 5);
-          var pen = Pens.Solid(Color.BlueViolet, 2);
+          StaveTool toolState = barrel.StaveToolState;
 
-          image.Mutate(x => x.DrawLine(pen, points));
-          image.Mutate(x => x.DrawText(detailsName, font, Color.Black, new PointF(10, 10)));
+          FontCollection collection = new();
+          try
+          {
+            //https://github.com/shantigilbert/liberation-fonts-ttf/blob/master/LiberationMono-Regular.ttf
+            collection.Add("fonts/LiberationMono-Regular.ttf");
+          }
+          catch (Exception e)
+          {
+            logger.LogError("Font loading exception: " + e.Message);
+          }
+
+          //IStaveConfig? config;
+          string paperType;
+          if (!GetPaperType(toolState, barrel, out paperType))
+          {
+            logger.LogError("error finding paper size");
+          }
+          //return DrawErrorMessage(collection, "error finding paper size");
+
+          int[] paperSize = PaperSizes[paperType];
+
+
+          int width = paperSize[0];
+          int height = paperSize[1];
+
+          using (Image<Rgba32> image = new(width, height))
+          {
+            if (collection.TryGet("Liberation Mono", out FontFamily family))
+            {
+              // family will not be null here
+              Font font = family.CreateFont(12, FontStyle.Italic);
+              string detailsName = barrel.BarrelDetails.Name;
+              //Pen p = new Pen()
+              var points = new PointF[4];
+              points[0] = new PointF(x: 0, y: 0);
+              points[1] = new PointF(x: width - 1, y: 0);
+              points[2] = new PointF(x: width - 1, y: height - 1);
+              points[3] = new PointF(x: 0, y: height - 1);
+              //PatternPen pen = Pens.DashDot(Color.Green, 5);
+              var pen = Pens.Solid(Color.BlueViolet, 2);
+
+              image.Mutate(x => x.DrawLine(pen, points));
+              image.Mutate(x => x.DrawText(detailsName, font, Color.Black, new PointF(10, 10)));
+            }
+
+            MemoryStream memoryStream = new();
+            image.SaveAsPng(memoryStream);
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            return memoryStream;
+          }
         }
 
-        MemoryStream memoryStream = new();
-        image.SaveAsPng(memoryStream);
-        memoryStream.Seek(0, SeekOrigin.Begin);
-        return memoryStream;
-      }
-    }
+    */
 
-
-
-    public static MemoryStream? Draw(BarrelForPrintouts barrel, int scale, ILogger logger)
+    public static MemoryStream? Draw(BarrelModel barrel, int scale, ILogger logger)
     {
       StaveTool toolState = barrel.StaveToolState;
       string paperType;
@@ -143,7 +144,7 @@ namespace SuperAniki.Laggen
     }
 
 
-    public static MemoryStream? Draw_SkiaSharp_Example(BarrelForPrintouts barrel, float scale, ILogger logger)
+    public static MemoryStream? Draw_SkiaSharp_Example(BarrelModel barrel, float scale, ILogger logger)
     {
       // Define the image dimensions
       int width = 800;

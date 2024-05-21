@@ -1,6 +1,6 @@
 using System;
 
-namespace BarrelUtility
+namespace SuperAniki.Laggen.Utilities
 {
   public static class BarrelHelper
   {
