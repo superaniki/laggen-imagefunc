@@ -1,17 +1,18 @@
-
+/*
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+*/
 using Microsoft.Extensions.Logging;
 using SkiaSharp;
 using SuperAniki.Laggen.Models;
 
 namespace SuperAniki.Laggen.Services
 {
-  public static class PaperService
+  public static class ImageGenerator
   {
 
     // Define the dictionary to map Paper enum values to their corresponding sizes
@@ -21,7 +22,7 @@ namespace SuperAniki.Laggen.Services
             { "A4", [210, 297] }
         };
 
-    private static bool GetPaperType(StaveTool type, BarrelModel barrel, out string paperType)
+    private static bool GetPaperType(StaveTool type, Barrel barrel, out string paperType)
     {
       switch (type)
       {
@@ -98,7 +99,7 @@ namespace SuperAniki.Laggen.Services
 
     */
 
-    public static MemoryStream? Draw(BarrelModel barrel, int scale, ILogger logger)
+    public static MemoryStream? Draw(Barrel barrel, int scale, ILogger logger)
     {
       StaveTool toolState = barrel.StaveToolState;
       string paperType;
@@ -144,7 +145,7 @@ namespace SuperAniki.Laggen.Services
     }
 
 
-    public static MemoryStream? Draw_SkiaSharp_Example(BarrelModel barrel, float scale, ILogger logger)
+    public static MemoryStream? Draw_SkiaSharp_Example(Barrel barrel, float scale, ILogger logger)
     {
       // Define the image dimensions
       int width = 800;

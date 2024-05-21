@@ -4,6 +4,7 @@ using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using SuperAniki.Laggen.Models;
 using SuperAniki.Laggen.Services;
+using SuperAniki.Laggen.Utilities;
 
 namespace SuperAniki.Laggen
 {
@@ -22,8 +23,10 @@ namespace SuperAniki.Laggen
                FunctionContext executionContext)
         {
             var logger = executionContext.GetLogger("SampleFunction");
-            BarrelModel barrelData;
+            Barrel barrelData;
             string jsonData;
+
+
 
             /* Load JSON from request body */
             try
@@ -36,7 +39,7 @@ namespace SuperAniki.Laggen
             }
 
             /* Create Barrel class object from JSON */
-            JsonResult<BarrelModel> result = JsonHandler.ExtractJsonData<BarrelModel>(jsonData, logger);
+            JsonResult<Barrel> result = JsonHandler.ExtractJsonData<Barrel>(jsonData, logger);
 
             if (!result.Success)
             {
@@ -48,7 +51,7 @@ namespace SuperAniki.Laggen
             /* Create image from class object */
             try
             {
-                Stream? imageStream = PaperService.Draw(barrelData, scale, logger);
+                Stream? imageStream = ImageGenerator.Draw(barrelData, scale, logger);
                 if (imageStream == null)
                 {
                     var errorResponse = req.CreateResponse(System.Net.HttpStatusCode.InternalServerError);
@@ -79,6 +82,10 @@ namespace SuperAniki.Laggen
 
     }
 }
+
+
+
+
 
 /*
             //"isolated worker"

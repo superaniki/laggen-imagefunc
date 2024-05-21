@@ -11,7 +11,7 @@ namespace SuperAniki.Laggen.Models
         Front,
         End
     }
-    public class BarrelModel
+    public class Barrel
     {
         [JsonProperty("staveToolState")]
         public StaveTool StaveToolState { get; set; }

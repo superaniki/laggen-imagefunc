@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 
-namespace SuperAniki.Laggen
+namespace SuperAniki.Laggen.Utilities
 {
 
   public class JsonResult<T>

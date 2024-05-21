@@ -3,6 +3,7 @@
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
+using SuperAniki.Laggen.Models;
 using System.Text.Json;
 
 
@@ -30,7 +31,7 @@ namespace SuperAniki.Laggen
 
             try
             {
-                data = JsonSerializer.Deserialize<BarrelForPrintouts>(requestBody);
+                data = JsonSerializer.Deserialize<Barrel>(requestBody);
             }
             catch (JsonException)
             {
