@@ -23,23 +23,32 @@ namespace SuperAniki.Laggen.Services
             { "A4", [210, 297] }
         };
 
-    private static bool GetPaperType(StaveTool type, Barrel barrel, out string paperType)
+    private static bool GetBarrelDetails(StaveTool type, Barrel barrel, out IConfigDetails? config)
     {
+      IStaveConfig staveConfig;
+      IConfigDetails[] configArray;
       switch (type)
       {
         case StaveTool.Curve:
-          paperType = barrel.StaveCurveConfig!.DefaultPaperType!;
-          return true;
+          staveConfig = barrel.StaveCurveConfig!;
+          configArray = barrel.StaveCurveConfig!.ConfigDetails!;
+          break;
         case StaveTool.End:
-          paperType = barrel.StaveEndConfig!.DefaultPaperType!;
-          return true;
+          staveConfig = barrel.StaveEndConfig!;
+          configArray = barrel.StaveEndConfig!.ConfigDetails!;
+
+          break;
         case StaveTool.Front:
-          paperType = barrel.StaveFrontConfig!.DefaultPaperType!;
-          return true;
+          staveConfig = barrel.StaveFrontConfig!;
+          configArray = barrel.StaveFrontConfig!.ConfigDetails!;
+          break;
         default:
-          paperType = "GetPaperType error";
+          config = null;
           return false;
       }
+
+      config = configArray!.Where(c => c.PaperType == staveConfig.DefaultPaperType!).First();
+      return true;
     }
     /*
         public static MemoryStream? Draw_ImageSharp(BarrelForPrintouts barrel, float scale, ILogger logger)
@@ -100,20 +109,33 @@ namespace SuperAniki.Laggen.Services
 
     */
 
+
+    public static void GetPaperSize(string paperType, bool rotate, out int width, out int height)
+    {
+      int[] paperSize = PaperSizes[paperType];
+      if (rotate)
+      {
+        width = paperSize[1];
+        height = paperSize[0];
+      }
+      else
+      {
+        width = paperSize[0];
+        height = paperSize[1];
+      }
+    }
     public static MemoryStream? Draw(Barrel barrel, int scale, ILogger logger)
     {
       StaveTool toolState = barrel.StaveToolState;
-      if (!GetPaperType(toolState, barrel, out string paperType))
+      if (!GetBarrelDetails(toolState, barrel, out IConfigDetails? config))
       {
-        logger.LogError("error finding paper size");
+        logger.LogError("Error extracting barrel details");
+        return null;
       }
 
-      int[] paperSize = PaperSizes[paperType];
-      int paperWidth = paperSize[0];
-      int paperHeight = paperSize[1];
+      GetPaperSize(config!.PaperType!, config!.RotatePaper, out int paperWidth, out int paperHeight);
       int imageWidth = paperWidth * scale;
       int imageHeight = paperHeight * scale;
-
       int margins = 15;
 
       using (var bitmap = new SKBitmap(imageWidth, imageHeight))
@@ -125,30 +147,46 @@ namespace SuperAniki.Laggen.Services
           canvas.Scale(scale);
           canvas.Clear(SKColors.Beige);
 
-          // Draw a rectangle
-          var paint = new SKPaint
+          //drawing of specialized templates here
+          switch (toolState)
           {
-            Color = SKColors.Blue,
-            IsAntialias = true,
-            Style = SKPaintStyle.Fill,
-            StrokeWidth = 1
-          };
+            case StaveTool.Curve:
+              CanvasTools.DrawStaveCurve(canvas, barrel!.BarrelDetails!, (StaveCurveConfigDetail)config, config!.PaperType!);
+              //CanvasTools.DrawInfoText(canvas, "StaveCurve", 4, 0, 15, 15);
+              break;
+            case StaveTool.End:
+              CanvasTools.DrawStaveEnds(canvas, paperWidth * 0.5f, paperHeight, barrel.BarrelDetails!, (StaveEndConfigDetail)config, config!.PaperType!);
+              //CanvasTools.DrawInfoText(canvas, "StaveEnd", 4, 0, 15, 15);
+              break;
+            case StaveTool.Front:
+              CanvasTools.DrawStaveFront(canvas, paperWidth * 0.5f, margins, barrel.BarrelDetails!, (StaveFrontConfigDetail)config, config!.PaperType!);
+              //CanvasTools.DrawInfoText(canvas, "StaveFront", 4, 0, 15, 15);
+              break;
+
+              /*
+    drawStaveEndsCTX(ctx, paperWidth * 0.5, paperHeight, barrelDetails, config, config.defaultPaperType as Paper)
+      drawStaveFrontCTX(ctx, paperWidth * 0.5, margins, barrelDetails, config, config.defaultPaperType as Paper)
+              */
+
+          }
+
+          /*
+                    // Draw a rectangle
+                    var paint = new SKPaint
+                    {
+                      Color = SKColors.Blue,
+                      IsAntialias = true,
+                      Style = SKPaintStyle.Fill,
+                      StrokeWidth = 1
+                    };*/
 
           var (name, height, angle, topDiameter, staveLength, bottomDiameter) = barrel.BarrelDetails!;
-
           var staveTemplateInfoText = "Height: " + height + "  Top diameter: " + topDiameter + "  Bottom diameter: " + bottomDiameter +
       "  Stave length: " + staveLength + "  Angle: " + angle;
 
           CanvasTools.DrawInfoText(canvas, staveTemplateInfoText, 3, 270, margins, paperHeight - 25);
           CanvasTools.DrawInfoText(canvas, name, 4, 0, 10, 10);
           CanvasTools.DrawBarrelSide(canvas, paperWidth - margins, paperHeight - margins, barrel.BarrelDetails, 0.07f);
-
-
-          //public static void DrawBarrelSide(SKCanvas canvas, float x, float y, BarrelDetails barrelDetails, float scale)
-
-
-          //canvas.DrawText(staveTemplateInfoText, 10, 10, paint);
-
         }
 
         using (var image = SKImage.FromBitmap(bitmap))
@@ -228,18 +266,6 @@ namespace SuperAniki.Laggen.Services
 
 
 /*
-        if (config != null)
-        {
-          var configDetails = config.ConfigDetails.Select(item => item.PaperType == paperType);
-        }
-        */
-
-
-
-/*
-
-
-
     public static MemoryStream DrawErrorMessage(FontCollection fonts, string message)
     {
       int width = 640;

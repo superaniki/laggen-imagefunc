@@ -66,9 +66,9 @@ namespace SuperAniki.Laggen
 
                 return okResponse;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return await ReturnErrorMessage(req, logger, "Problem creating image from json");
+                return await ReturnErrorMessage(req, logger, "Problem creating image from json: " + e.Message);
             }
         }
 

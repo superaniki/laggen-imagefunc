@@ -54,7 +54,6 @@ namespace SuperAniki.Laggen.Utilities
                     path.Close(); // Close the path to connect the last point to the first
                 }
 
-
                 var paint = new SKPaint
                 {
                     Style = useFill ? SKPaintStyle.Fill : SKPaintStyle.Stroke,
@@ -69,7 +68,7 @@ namespace SuperAniki.Laggen.Utilities
                 public static void DrawCurve(SKCanvas canvas, double x, double y, double[] points, string title)
                 {
                     DrawPath(canvas, x, y, points);
-                    using (var paint = new SKPaint { Color = SKColors.Black, TextSize = 6 * 96.0f / 72.0f })
+                    using (var paint = new SKPaint { Color = SKqColors.Black, TextSize = 6 * 96.0f / 72.0f })
                     {
                         canvas.DrawText(title, x + 4.5f, y - 6f, paint);
                     }
@@ -113,5 +112,35 @@ namespace SuperAniki.Laggen.Utilities
 
             DrawPath(canvas, -length, -bottomMargin, bottomPlantePoints);
         }
+
+        public static void DrawStaveCurve(SKCanvas canvas, BarrelDetails barrelDetails, StaveCurveConfigDetail config, string paperType)
+        {
+            DrawInfoText(canvas, "Test test DrawStaveCurve", 4, 45, 15, 15);
+        }
+
+        public static void DrawStaveEnds(SKCanvas canvas, float x, float y, BarrelDetails barrelDetails, StaveEndConfigDetail config, string paperType)
+        {
+            DrawInfoText(canvas, "Test test DrawStaveEnds", 4, 45, 15, 15);
+        }
+
+        public static void DrawStaveFront(SKCanvas canvas, float x, float y, BarrelDetails barrelDetails, StaveFrontConfigDetail config, string paperType)
+        {
+            DrawInfoText(canvas, "Test test DrawStaveFront", 4, 45, 15, 15);
+        }
     }
 }
+
+/*
+  drawStaveCurveCTX(ctx, config.defaultPaperType as Paper, barrelDetails, config)
+      drawStaveEndsCTX(ctx, paperWidth * 0.5, paperHeight, barrelDetails, config, config.defaultPaperType as Paper)
+      drawStaveFrontCTX(ctx, paperWidth * 0.5, margins, barrelDetails, config, config.defaultPaperType as Paper)
+
+
+export function drawStaveEndsCTX(ctx: PImage.Context, x: number, y: number, barrelDetails: BarrelDetails, config: StaveEndConfigWithData, paperState: Paper) {
+	const { angle, height, bottomDiameter, staveBottomThickness, staveTopThickness } = { ...barrelDetails };
+	const configDetailsArray = config.configDetails;
+
+    xport function drawStaveFrontCTX(ctx: PImage.Context, x: number, y: number, barrelDetails: BarrelDetails, config: StaveFrontConfigWithData, paperState: Paper) {
+	const { bottomDiameter, topDiameter, staveLength } = { ...barrelDetails };
+	const configDetailsArray = config.configDetails;
+*/
