@@ -9,6 +9,7 @@ using SixLabors.ImageSharp.Processing;
 using Microsoft.Extensions.Logging;
 using SkiaSharp;
 using SuperAniki.Laggen.Models;
+using SuperAniki.Laggen.Utilities;
 
 namespace SuperAniki.Laggen.Services
 {
@@ -102,16 +103,20 @@ namespace SuperAniki.Laggen.Services
     public static MemoryStream? Draw(Barrel barrel, int scale, ILogger logger)
     {
       StaveTool toolState = barrel.StaveToolState;
-      string paperType;
-      if (!GetPaperType(toolState, barrel, out paperType))
+      if (!GetPaperType(toolState, barrel, out string paperType))
       {
         logger.LogError("error finding paper size");
       }
 
       int[] paperSize = PaperSizes[paperType];
-      int width = paperSize[0] * scale;
-      int height = paperSize[1] * scale;
-      using (var bitmap = new SKBitmap(width, height))
+      int paperWidth = paperSize[0];
+      int paperHeight = paperSize[1];
+      int imageWidth = paperWidth * scale;
+      int imageHeight = paperHeight * scale;
+
+      int margins = 15;
+
+      using (var bitmap = new SKBitmap(imageWidth, imageHeight))
       {
         // Create a canvas to draw on the bitmap
         using (var canvas = new SKCanvas(bitmap))
@@ -129,10 +134,23 @@ namespace SuperAniki.Laggen.Services
             StrokeWidth = 1
           };
 
-          canvas.DrawRect(new SKRect(10, 10, 50, 50), paint);
-          string detailsName = barrel.BarrelDetails!.Name!;
-          canvas.DrawText(detailsName, 10, 10, paint);
+          var (name, height, angle, topDiameter, staveLength, bottomDiameter) = barrel.BarrelDetails!;
+
+          var staveTemplateInfoText = "Height: " + height + "  Top diameter: " + topDiameter + "  Bottom diameter: " + bottomDiameter +
+      "  Stave length: " + staveLength + "  Angle: " + angle;
+
+          CanvasTools.DrawInfoText(canvas, staveTemplateInfoText, 3, 270, margins, paperHeight - 25);
+          CanvasTools.DrawInfoText(canvas, name, 4, 0, 10, 10);
+          CanvasTools.DrawBarrelSide(canvas, paperWidth - margins, paperHeight - margins, barrel.BarrelDetails, 0.07f);
+
+
+          //public static void DrawBarrelSide(SKCanvas canvas, float x, float y, BarrelDetails barrelDetails, float scale)
+
+
+          //canvas.DrawText(staveTemplateInfoText, 10, 10, paint);
+
         }
+
         using (var image = SKImage.FromBitmap(bitmap))
         using (var data = image.Encode(SKEncodedImageFormat.Png, 100))
         {

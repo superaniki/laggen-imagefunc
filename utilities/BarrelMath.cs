@@ -1,8 +1,9 @@
 using System;
+using SuperAniki.Laggen.Models;
 
 namespace SuperAniki.Laggen.Utilities
 {
-  public static class BarrelHelper
+  public static class BarrelMath
   {
     public static double FindDiameter(double oldDiameter, double x2, double y2)
     {
@@ -234,20 +235,22 @@ namespace SuperAniki.Laggen.Utilities
       double scale = 1;
       if (obj.width > view.width || obj.height > view.height)
       {
-        double scaleWidth = (margins * view.width) / obj.width;
-        double scaleHeight = (margins * view.height) / obj.height;
+        double scaleWidth = margins * view.width / obj.width;
+        double scaleHeight = margins * view.height / obj.height;
         scale = scaleHeight > scaleWidth ? scaleWidth : scaleHeight;
       }
       else
       {
-        double scaleWidth = (margins * view.width) / obj.width;
-        double scaleHeight = (margins * view.height) / obj.height;
+        double scaleWidth = margins * view.width / obj.width;
+        double scaleHeight = margins * view.height / obj.height;
         scale = scaleHeight > scaleWidth ? scaleWidth : scaleHeight;
       }
       return scale;
     }
   }
+}
 
+/*
   public class BarrelDetails
   {
     public double TopDiameter { get; set; }
@@ -257,3 +260,4 @@ namespace SuperAniki.Laggen.Utilities
     public double? Angle { get; set; }
   }
 }
+*/

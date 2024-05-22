@@ -41,13 +41,13 @@ namespace SuperAniki.Laggen.Models
         public string? Notes { get; set; }
 
         [JsonProperty("height")]
-        public long Height { get; set; }
+        public double Height { get; set; }
 
         [JsonProperty("bottomDiameter")]
-        public long BottomDiameter { get; set; }
+        public double BottomDiameter { get; set; }
 
         [JsonProperty("topDiameter")]
-        public long TopDiameter { get; set; }
+        public double TopDiameter { get; set; }
 
         [JsonProperty("staveLength")]
         public double StaveLength { get; set; }
@@ -56,16 +56,16 @@ namespace SuperAniki.Laggen.Models
         public double Angle { get; set; }
 
         [JsonProperty("staveBottomThickness")]
-        public long StaveBottomThickness { get; set; }
+        public double StaveBottomThickness { get; set; }
 
         [JsonProperty("staveTopThickness")]
-        public long StaveTopThickness { get; set; }
+        public double StaveTopThickness { get; set; }
 
         [JsonProperty("bottomThickness")]
-        public long BottomThickness { get; set; }
+        public double BottomThickness { get; set; }
 
         [JsonProperty("bottomMargin")]
-        public long BottomMargin { get; set; }
+        public double BottomMargin { get; set; }
 
         [JsonProperty("isPublic")]
         public bool IsPublic { get; set; }
@@ -75,6 +75,40 @@ namespace SuperAniki.Laggen.Models
 
         [JsonProperty("barrelId")]
         public string? BarrelId { get; set; }
+
+
+        public void Deconstruct(out string name, out double height, out double bottomDiameter,
+                               out double topDiameter, out double staveLength, out double angle)
+        {
+            name = Name;
+            height = Height;
+            bottomDiameter = BottomDiameter;
+            topDiameter = TopDiameter;
+            staveLength = StaveLength;
+            angle = Angle;
+        }
+
+        public void Deconstruct(out string? id, out string? name, out string? notes, out double height, out double bottomDiameter,
+                               out double topDiameter, out double staveLength, out double angle, out double staveBottomThickness,
+                               out double staveTopThickness, out double bottomThickness, out double bottomMargin, out bool isPublic,
+                               out bool isExample, out string? barrelId)
+        {
+            id = Id;
+            name = Name;
+            notes = Notes;
+            height = Height;
+            bottomDiameter = BottomDiameter;
+            topDiameter = TopDiameter;
+            staveLength = StaveLength;
+            angle = Angle;
+            staveBottomThickness = StaveBottomThickness;
+            staveTopThickness = StaveTopThickness;
+            bottomThickness = BottomThickness;
+            bottomMargin = BottomMargin;
+            isPublic = IsPublic;
+            isExample = IsExample;
+            barrelId = BarrelId;
+        }
     }
 
     public interface IStaveConfig
@@ -120,46 +154,46 @@ namespace SuperAniki.Laggen.Models
         public bool RotatePaper { get; set; }
 
         [JsonProperty("posX")]
-        public long PosX { get; set; }
+        public double PosX { get; set; }
 
         [JsonProperty("posY")]
-        public long PosY { get; set; }
+        public double PosY { get; set; }
 
         [JsonProperty("innerTopX")]
         public double InnerTopX { get; set; }
 
         [JsonProperty("innerTopY")]
-        public long InnerTopY { get; set; }
+        public double InnerTopY { get; set; }
 
         [JsonProperty("outerTopX")]
         public double OuterTopX { get; set; }
 
         [JsonProperty("outerTopY")]
-        public long OuterTopY { get; set; }
+        public double OuterTopY { get; set; }
 
         [JsonProperty("innerBottomX")]
         public double InnerBottomX { get; set; }
 
         [JsonProperty("innerBottomY")]
-        public long InnerBottomY { get; set; }
+        public double InnerBottomY { get; set; }
 
         [JsonProperty("outerBottomX")]
         public double OuterBottomX { get; set; }
 
         [JsonProperty("outerBottomY")]
-        public long OuterBottomY { get; set; }
+        public double OuterBottomY { get; set; }
 
         [JsonProperty("rectX")]
-        public long RectX { get; set; }
+        public double RectX { get; set; }
 
         [JsonProperty("rectY")]
-        public long RectY { get; set; }
+        public double RectY { get; set; }
 
         [JsonProperty("rectWidth")]
-        public long RectWidth { get; set; }
+        public double RectWidth { get; set; }
 
         [JsonProperty("rectHeight")]
-        public long RectHeight { get; set; }
+        public double RectHeight { get; set; }
 
         [JsonProperty("staveCurveConfigId")]
         public string? StaveCurveConfigId { get; set; }
@@ -192,10 +226,10 @@ namespace SuperAniki.Laggen.Models
         public bool RotatePaper { get; set; }
 
         [JsonProperty("topEndY")]
-        public long TopEndY { get; set; }
+        public double TopEndY { get; set; }
 
         [JsonProperty("bottomEndY")]
-        public long BottomEndY { get; set; }
+        public double BottomEndY { get; set; }
 
         [JsonProperty("staveEndConfigId")]
         public string? StaveEndConfigId { get; set; }
@@ -228,13 +262,13 @@ namespace SuperAniki.Laggen.Models
         public bool RotatePaper { get; set; }
 
         [JsonProperty("posX")]
-        public long PosX { get; set; }
+        public double PosX { get; set; }
 
         [JsonProperty("posY")]
-        public long PosY { get; set; }
+        public double PosY { get; set; }
 
         [JsonProperty("spacing")]
-        public long Spacing { get; set; }
+        public double Spacing { get; set; }
 
         [JsonProperty("staveFrontConfigId")]
         public string? StaveFrontConfigId { get; set; }
