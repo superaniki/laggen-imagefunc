@@ -124,7 +124,15 @@ namespace SuperAniki.Laggen.Services
         height = paperSize[1];
       }
     }
-    public static MemoryStream? Draw(Barrel barrel, int scale, ILogger logger)
+
+    public static double MmToPixels(double widthMm, double dpi)
+    {
+      double scaleFactor = dpi / 25.4;
+      double widthPixels = widthMm * scaleFactor;
+      return widthPixels;
+    }
+
+    public static MemoryStream? Draw(Barrel barrel, int dpi, string format, ILogger logger)
     {
       StaveTool toolState = barrel.StaveToolState;
       if (!GetBarrelDetails(toolState, barrel, out IConfigDetails? config))
@@ -134,8 +142,10 @@ namespace SuperAniki.Laggen.Services
       }
 
       GetPaperSize(config!.PaperType!, config!.RotatePaper, out int paperWidth, out int paperHeight);
-      int imageWidth = paperWidth * scale;
-      int imageHeight = paperHeight * scale;
+      float scale = (float)(dpi / 25.4); // make dpi into scale factor for pixels
+
+      int imageWidth = Convert.ToInt32(paperWidth * scale);
+      int imageHeight = Convert.ToInt32(paperHeight * scale);
       int margins = 15;
 
       using (var bitmap = new SKBitmap(imageWidth, imageHeight))
@@ -189,8 +199,25 @@ namespace SuperAniki.Laggen.Services
           CanvasTools.DrawBarrelSide(canvas, paperWidth - margins, paperHeight - margins, barrel.BarrelDetails, 0.07f);
         }
 
+        SKEncodedImageFormat imageFormat = SKEncodedImageFormat.Png;
+        int imageQuality = 100;
+        switch (format.ToLower())
+        {
+          case "png":
+            imageFormat = SKEncodedImageFormat.Png;
+            imageQuality = 100;
+            break;
+          case "jpeg":
+            imageFormat = SKEncodedImageFormat.Jpeg;
+            imageQuality = 95;
+            break;
+          default:
+            imageFormat = SKEncodedImageFormat.Png;
+            break;
+        }
+
         using (var image = SKImage.FromBitmap(bitmap))
-        using (var data = image.Encode(SKEncodedImageFormat.Png, 100))
+        using (var data = image.Encode(imageFormat, imageQuality))
         {
           MemoryStream memoryStream = new();
           data.SaveTo(memoryStream);

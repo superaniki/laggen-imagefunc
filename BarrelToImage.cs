@@ -6,8 +6,26 @@ using SuperAniki.Laggen.Models;
 using SuperAniki.Laggen.Services;
 using SuperAniki.Laggen.Utilities;
 
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
+
+
+
 namespace SuperAniki.Laggen
 {
+    public class RespnseJsonData
+    {
+        [JsonProperty("barrel")]
+        public Barrel? Barrel { get; set; }
+
+        [JsonProperty("dpi")]
+        public int Dpi { get; set; }
+
+        [JsonProperty("format")]
+        public string Format { get; set; }
+
+    }
     public class LaggToImage
     {
         private readonly ILogger<LaggToImage> _logger;
@@ -23,10 +41,7 @@ namespace SuperAniki.Laggen
                FunctionContext executionContext)
         {
             var logger = executionContext.GetLogger("SampleFunction");
-            Barrel barrelData;
             string jsonData;
-
-
 
             /* Load JSON from request body */
             try
@@ -39,19 +54,29 @@ namespace SuperAniki.Laggen
             }
 
             /* Create Barrel class object from JSON */
-            JsonResult<Barrel> result = JsonHandler.ExtractJsonData<Barrel>(jsonData, logger);
+
+            JsonResult<RespnseJsonData> result = JsonHandler.ExtractJsonData<RespnseJsonData>(jsonData, logger);
+
 
             if (!result.Success)
             {
                 return await ReturnErrorMessage(req, logger, result.ErrorMessage!);
             }
-            barrelData = result.Data!;
-            int scale = 6;
+
+            if (result.Data == null)
+            {
+                return await ReturnErrorMessage(req, logger, "Jsondata was null");
+            }
+
+            Barrel barrelData = result.Data.Barrel!;
+            int dpi = result.Data.Dpi;
+            string format = result.Data.Format;
+            Console.WriteLine(format);
 
             /* Create image from class object */
             try
             {
-                Stream? imageStream = ImageGenerator.Draw(barrelData, scale, logger);
+                Stream? imageStream = ImageGenerator.Draw(barrelData, dpi, format, logger);
                 if (imageStream == null)
                 {
                     var errorResponse = req.CreateResponse(System.Net.HttpStatusCode.InternalServerError);
@@ -59,7 +84,7 @@ namespace SuperAniki.Laggen
                     return errorResponse;
                 }
                 var okResponse = req.CreateResponse(System.Net.HttpStatusCode.OK);
-                okResponse.Headers.Add("Content-Type", "image/png");
+                okResponse.Headers.Add("Content-Type", "image/" + format.ToLower());
 
                 await imageStream.CopyToAsync(okResponse.Body);
                 logger.LogError("image ok. response coming:");

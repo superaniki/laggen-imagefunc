@@ -37,7 +37,7 @@ namespace SuperAniki.Laggen.Utilities
             canvas.Restore();
         }
 
-        public static void DrawPath(SKCanvas canvas, double x, double y, double[] points, bool closed = false, bool useFill = false)
+        public static void DrawPath(SKCanvas canvas, double x, double y, double[] points, SKPaint? _paint = null, bool closedPath = false)
         {
             using (var path = new SKPath())
             {
@@ -49,18 +49,23 @@ namespace SuperAniki.Laggen.Utilities
                     path.LineTo((float)(points[i] + x), (float)(points[i + 1] + y)); // Draw line to next point
                 }
 
-                if (closed)
+                if (closedPath)
                 {
                     path.Close(); // Close the path to connect the last point to the first
                 }
 
-                var paint = new SKPaint
+                SKPaint paint = new();
+                if (_paint != null)
                 {
-                    Style = useFill ? SKPaintStyle.Fill : SKPaintStyle.Stroke,
-                    StrokeWidth = 1,
-                    IsAntialias = true
-                };
+                    paint = _paint;
+                }
+                else
+                {
+                    paint.Style = SKPaintStyle.Stroke;
+                    paint.StrokeWidth = 1;
+                }
 
+                paint.IsAntialias = true;
                 canvas.DrawPath(path, paint);
             }
         }
@@ -101,6 +106,9 @@ namespace SuperAniki.Laggen.Utilities
             canvas.Save();
             canvas.Translate((float)(-bottomDiameter - length), 0);
             canvas.RotateDegrees((float)-angle);
+
+
+
             DrawPath(canvas, 0, 0, leftStavePoints);
             canvas.Restore();
 
@@ -123,24 +131,76 @@ namespace SuperAniki.Laggen.Utilities
             DrawInfoText(canvas, "Test test DrawStaveEnds", 4, 45, 15, 15);
         }
 
+
+        public class TextData
+        {
+            public double X { get; set; }
+            public double Y { get; set; }
+            public string Text { get; set; }
+        }
+
+        public class StaveTemplatePointsResult
+        {
+            public List<double[]> Points { get; set; }
+            public List<TextData> TextData { get; set; }
+        }
+
+        public static StaveTemplatePointsResult CalcStaveTemplatePoints(double topDiameter, double bottomDiameter, double staveLength, double spacing)
+        {
+            double mmPerSizeChange = spacing;
+            double mmPerSizeChangeBottom = bottomDiameter / topDiameter * mmPerSizeChange;
+            var points = new List<double[]>();
+            var textData = new List<TextData>();
+
+            double diaBottom = bottomDiameter;
+            int count = 1;
+
+            for (double diaTop = topDiameter; diaTop >= 0 && diaBottom >= 0; diaTop -= mmPerSizeChange)
+            {
+                points.Add([-diaBottom * 0.5, 0, -diaTop * 0.5, -staveLength, diaTop * 0.5, -staveLength, diaBottom * 0.5, 0]);
+                textData.Add(new TextData { X = -diaTop * 0.5, Y = -staveLength, Text = count.ToString() });
+                textData.Add(new TextData { X = diaTop * 0.5, Y = -staveLength, Text = count.ToString() });
+                count++;
+                diaBottom -= mmPerSizeChangeBottom;
+            }
+
+            return new StaveTemplatePointsResult { Points = points, TextData = textData };
+        }
+
         public static void DrawStaveFront(SKCanvas canvas, float x, float y, BarrelDetails barrelDetails, StaveFrontConfigDetail config, string paperType)
         {
-            DrawInfoText(canvas, "Test test DrawStaveFront", 4, 45, 15, 15);
+            DrawInfoText(canvas, "DrawStaveFront", 4, 45, 15, 15);
+
+            var (name, height, bottomDiameter, topDiameter, staveLength, angle) = barrelDetails;
+
+            var pointsData = CalcStaveTemplatePoints(topDiameter, bottomDiameter, staveLength, config.Spacing);
+
+            canvas.Save();
+            canvas.Translate(x, (float)config.PosY);
+
+            var paintFill = new SKPaint { Style = SKPaintStyle.Fill, Color = SKColors.LightGray, StrokeWidth = 0 };
+            {
+                DrawPath(canvas, 0, 0, pointsData.Points[0], paintFill, true);
+            }
+
+            using (var paintStroke = new SKPaint { Style = SKPaintStyle.Stroke, Color = SKColors.Black, StrokeWidth = 0.25f })
+            {
+                foreach (var element in pointsData.Points)
+                {
+                    DrawPath(canvas, 0, 0, element, paintStroke, true);
+                }
+            }
+
+            using (var textPaint = new SKPaint { Color = SKColors.Black, TextSize = 2.5f })
+            {
+                foreach (var element in pointsData.TextData)
+                {
+                    canvas.DrawText(element.Text, (float)element.X - 2, (float)element.Y - 6, textPaint);
+                }
+            }
+
+            canvas.Restore();
+
         }
     }
 }
-
-/*
-  drawStaveCurveCTX(ctx, config.defaultPaperType as Paper, barrelDetails, config)
-      drawStaveEndsCTX(ctx, paperWidth * 0.5, paperHeight, barrelDetails, config, config.defaultPaperType as Paper)
-      drawStaveFrontCTX(ctx, paperWidth * 0.5, margins, barrelDetails, config, config.defaultPaperType as Paper)
-
-
-export function drawStaveEndsCTX(ctx: PImage.Context, x: number, y: number, barrelDetails: BarrelDetails, config: StaveEndConfigWithData, paperState: Paper) {
-	const { angle, height, bottomDiameter, staveBottomThickness, staveTopThickness } = { ...barrelDetails };
-	const configDetailsArray = config.configDetails;
-
-    xport function drawStaveFrontCTX(ctx: PImage.Context, x: number, y: number, barrelDetails: BarrelDetails, config: StaveFrontConfigWithData, paperState: Paper) {
-	const { bottomDiameter, topDiameter, staveLength } = { ...barrelDetails };
-	const configDetailsArray = config.configDetails;
-*/
