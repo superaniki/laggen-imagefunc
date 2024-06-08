@@ -76,6 +76,14 @@ namespace SuperAniki.Laggen.Models
         [JsonProperty("barrelId")]
         public string? BarrelId { get; set; }
 
+        public void Deconstruct(out double height, out double angle, out double bottomDiameter, out double staveBottomThickness, out double staveTopThickness)
+        {
+            height = Height;
+            angle = Angle;
+            bottomDiameter = BottomDiameter;
+            staveBottomThickness = StaveBottomThickness;
+            staveTopThickness = StaveTopThickness;
+        }
 
         public void Deconstruct(out string name, out double height, out double bottomDiameter,
                                out double topDiameter, out double staveLength, out double angle)
@@ -140,6 +148,7 @@ namespace SuperAniki.Laggen.Models
 
         [JsonProperty("configDetails")]
         public StaveCurveConfigDetail[]? ConfigDetails { get; set; }
+
     }
 
     public class StaveCurveConfigDetail : IConfigDetails
@@ -197,6 +206,32 @@ namespace SuperAniki.Laggen.Models
 
         [JsonProperty("staveCurveConfigId")]
         public string? StaveCurveConfigId { get; set; }
+
+
+        //             var (posX, posY, innerTopY, outerTopY, innerBottomY, outerBottomY, rectX, rectY, rectWidth, rectHeight) = config;
+
+        public void Deconstruct(out double posX,
+                                out double posY,
+                                out double innerTopY,
+                                out double outerTopY,
+                                out double innerBottomY,
+                                out double outerBottomY,
+                                out double rectX,
+                                out double rectY,
+                                out double rectWidth,
+                                out double rectHeight)
+        {
+            posX = PosX;
+            posY = PosY;
+            innerTopY = InnerTopY;
+            outerTopY = OuterTopY;
+            innerBottomY = InnerBottomY;
+            outerBottomY = OuterBottomY;
+            rectX = RectX;
+            rectY = RectY;
+            rectWidth = RectWidth;
+            rectHeight = RectHeight;
+        }
     }
 
     public class StaveEndConfig : IStaveConfig

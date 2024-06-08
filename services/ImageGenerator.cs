@@ -47,69 +47,10 @@ namespace SuperAniki.Laggen.Services
           return false;
       }
 
+      // Hämtar rätt config beroende på pappersstorlek
       config = configArray!.Where(c => c.PaperType == staveConfig.DefaultPaperType!).First();
       return true;
     }
-    /*
-        public static MemoryStream? Draw_ImageSharp(BarrelForPrintouts barrel, float scale, ILogger logger)
-        {
-          StaveTool toolState = barrel.StaveToolState;
-
-          FontCollection collection = new();
-          try
-          {
-            //https://github.com/shantigilbert/liberation-fonts-ttf/blob/master/LiberationMono-Regular.ttf
-            collection.Add("fonts/LiberationMono-Regular.ttf");
-          }
-          catch (Exception e)
-          {
-            logger.LogError("Font loading exception: " + e.Message);
-          }
-
-          //IStaveConfig? config;
-          string paperType;
-          if (!GetPaperType(toolState, barrel, out paperType))
-          {
-            logger.LogError("error finding paper size");
-          }
-          //return DrawErrorMessage(collection, "error finding paper size");
-
-          int[] paperSize = PaperSizes[paperType];
-
-
-          int width = paperSize[0];
-          int height = paperSize[1];
-
-          using (Image<Rgba32> image = new(width, height))
-          {
-            if (collection.TryGet("Liberation Mono", out FontFamily family))
-            {
-              // family will not be null here
-              Font font = family.CreateFont(12, FontStyle.Italic);
-              string detailsName = barrel.BarrelDetails.Name;
-              //Pen p = new Pen()
-              var points = new PointF[4];
-              points[0] = new PointF(x: 0, y: 0);
-              points[1] = new PointF(x: width - 1, y: 0);
-              points[2] = new PointF(x: width - 1, y: height - 1);
-              points[3] = new PointF(x: 0, y: height - 1);
-              //PatternPen pen = Pens.DashDot(Color.Green, 5);
-              var pen = Pens.Solid(Color.BlueViolet, 2);
-
-              image.Mutate(x => x.DrawLine(pen, points));
-              image.Mutate(x => x.DrawText(detailsName, font, Color.Black, new PointF(10, 10)));
-            }
-
-            MemoryStream memoryStream = new();
-            image.SaveAsPng(memoryStream);
-            memoryStream.Seek(0, SeekOrigin.Begin);
-            return memoryStream;
-          }
-        }
-
-    */
-
-
     public static void GetPaperSize(string paperType, bool rotate, out int width, out int height)
     {
       int[] paperSize = PaperSizes[paperType];
@@ -172,23 +113,7 @@ namespace SuperAniki.Laggen.Services
               CanvasTools.DrawStaveFront(canvas, paperWidth * 0.5f, margins, barrel.BarrelDetails!, (StaveFrontConfigDetail)config, config!.PaperType!);
               //CanvasTools.DrawInfoText(canvas, "StaveFront", 4, 0, 15, 15);
               break;
-
-              /*
-    drawStaveEndsCTX(ctx, paperWidth * 0.5, paperHeight, barrelDetails, config, config.defaultPaperType as Paper)
-      drawStaveFrontCTX(ctx, paperWidth * 0.5, margins, barrelDetails, config, config.defaultPaperType as Paper)
-              */
-
           }
-
-          /*
-                    // Draw a rectangle
-                    var paint = new SKPaint
-                    {
-                      Color = SKColors.Blue,
-                      IsAntialias = true,
-                      Style = SKPaintStyle.Fill,
-                      StrokeWidth = 1
-                    };*/
 
           var (name, height, angle, topDiameter, staveLength, bottomDiameter) = barrel.BarrelDetails!;
           var staveTemplateInfoText = "Height: " + height + "  Top diameter: " + topDiameter + "  Bottom diameter: " + bottomDiameter +

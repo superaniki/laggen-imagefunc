@@ -107,8 +107,6 @@ namespace SuperAniki.Laggen.Utilities
             canvas.Translate((float)(-bottomDiameter - length), 0);
             canvas.RotateDegrees((float)-angle);
 
-
-
             DrawPath(canvas, 0, 0, leftStavePoints);
             canvas.Restore();
 
@@ -121,10 +119,6 @@ namespace SuperAniki.Laggen.Utilities
             DrawPath(canvas, -length, -bottomMargin, bottomPlantePoints);
         }
 
-        public static void DrawStaveCurve(SKCanvas canvas, BarrelDetails barrelDetails, StaveCurveConfigDetail config, string paperType)
-        {
-            DrawInfoText(canvas, "Test test DrawStaveCurve", 4, 45, 15, 15);
-        }
 
         public static void DrawStaveEnds(SKCanvas canvas, float x, float y, BarrelDetails barrelDetails, StaveEndConfigDetail config, string paperType)
         {
@@ -166,6 +160,58 @@ namespace SuperAniki.Laggen.Utilities
 
             return new StaveTemplatePointsResult { Points = points, TextData = textData };
         }
+
+        public static void DrawCurve(SKCanvas canvas, double x, double y, double[] points, string title)
+        {
+            DrawPath(canvas, x, y, points);
+
+            using (var textPaint = new SKPaint { Color = SKColors.Black, TextSize = 6 * 96.0f / 72.0f })
+            {
+                canvas.DrawText(title, (float)(x + 4.5), (float)y - 6, textPaint);
+            }
+        }
+
+        public static void DrawStaveCurve(SKCanvas canvas, BarrelDetails barrelDetails, StaveCurveConfigDetail config, string paperType)
+        {
+            DrawInfoText(canvas, "Test test DrawStaveCurve", 4, 45, 15, 15);
+            var (height, angle, bottomDiameter, staveBottomThickness, staveTopThickness) = barrelDetails;
+            var (posX, posY, innerTopY, outerTopY, innerBottomY, outerBottomY, rectX, rectY, rectWidth, rectHeight) = config;
+
+
+            double tan = Math.Tan((angle * Math.PI) / 180);
+            double length = tan * height; // position till motsatt sida av vinkeln
+            double topOuterDiameter = length * 2 + bottomDiameter;
+            double bottomOuterDiameter = bottomDiameter;
+
+            double adjustedBottomOuterDiameter = BarrelMath.FindAdjustedDiameter(bottomOuterDiameter, angle);
+            double adjustedBottomInnerDiameter = adjustedBottomOuterDiameter - staveBottomThickness * 2;
+            double adjustedTopOuterDiameter = BarrelMath.FindAdjustedDiameter(topOuterDiameter, angle);
+            double adjustedTopInnerDiameter = adjustedTopOuterDiameter - staveTopThickness * 2;
+
+            double maxStaveWidth = 100;
+
+            double[] adjustedBottomOuterPoints = BarrelMath.CreateCurveMaxWidth(adjustedBottomOuterDiameter, 90, 180, maxStaveWidth);
+            double[] adjustedBottomInnerPoints = BarrelMath.CreateCurveMaxWidth(adjustedBottomInnerDiameter, 90, 180, maxStaveWidth);
+            double[] adjustedTopOuterPoints = BarrelMath.CreateCurveMaxWidth(adjustedTopOuterDiameter, 90, 180, maxStaveWidth);
+            double[] adjustedTopInnerPoints = BarrelMath.CreateCurveMaxWidth(adjustedTopInnerDiameter, 90, 180, maxStaveWidth);
+
+            double curveXpos = rectX + rectWidth;
+
+            canvas.Save();
+            canvas.Translate((float)posX, (float)posY);
+
+            DrawCurve(canvas, curveXpos, outerBottomY, adjustedBottomOuterPoints, "Bottom, outer");
+            DrawCurve(canvas, curveXpos, innerBottomY, adjustedBottomInnerPoints, "Bottom, inner");
+            DrawCurve(canvas, curveXpos, outerTopY, adjustedTopOuterPoints, "Top, outer");
+            DrawCurve(canvas, curveXpos, innerTopY, adjustedTopInnerPoints, "Top, inner");
+
+            using (var paint = new SKPaint { Style = SKPaintStyle.Stroke, Color = SKColors.Black, StrokeWidth = 1 })
+            {
+                canvas.DrawRect((float)rectX, (float)rectY, (float)rectWidth, (float)rectHeight, paint);
+            }
+            canvas.Restore();
+        }
+
 
         public static void DrawStaveFront(SKCanvas canvas, float x, float y, BarrelDetails barrelDetails, StaveFrontConfigDetail config, string paperType)
         {
