@@ -76,13 +76,16 @@ namespace SuperAniki.Laggen.Models
         [JsonProperty("barrelId")]
         public string? BarrelId { get; set; }
 
-        public void Deconstruct(out double height, out double angle, out double bottomDiameter, out double staveBottomThickness, out double staveTopThickness)
+        public void Deconstruct(out double height, out double angle, out double bottomDiameter, out double staveBottomThickness, out double staveTopThickness,
+        out double bottomThickness, out double bottomMargin)
         {
             height = Height;
             angle = Angle;
             bottomDiameter = BottomDiameter;
             staveBottomThickness = StaveBottomThickness;
             staveTopThickness = StaveTopThickness;
+            bottomThickness = BottomThickness;
+            bottomMargin = BottomMargin;
         }
 
         public void Deconstruct(out string name, out double height, out double bottomDiameter,

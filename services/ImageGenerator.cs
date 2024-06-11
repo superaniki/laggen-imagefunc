@@ -102,16 +102,13 @@ namespace SuperAniki.Laggen.Services
           switch (toolState)
           {
             case StaveTool.Curve:
-              CanvasTools.DrawStaveCurve(canvas, barrel!.BarrelDetails!, (StaveCurveConfigDetail)config, config!.PaperType!);
-              //CanvasTools.DrawInfoText(canvas, "StaveCurve", 4, 0, 15, 15);
+              CanvasTools.DrawStaveCurve(canvas, barrel!.BarrelDetails!, (StaveCurveConfigDetail)config);
               break;
             case StaveTool.End:
-              CanvasTools.DrawStaveEnds(canvas, paperWidth * 0.5f, paperHeight, barrel.BarrelDetails!, (StaveEndConfigDetail)config, config!.PaperType!);
-              //CanvasTools.DrawInfoText(canvas, "StaveEnd", 4, 0, 15, 15);
+              CanvasTools.DrawStaveEnds(canvas, paperWidth * 0.5f, paperHeight, barrel.BarrelDetails!, (StaveEndConfigDetail)config);
               break;
             case StaveTool.Front:
-              CanvasTools.DrawStaveFront(canvas, paperWidth * 0.5f, margins, barrel.BarrelDetails!, (StaveFrontConfigDetail)config, config!.PaperType!);
-              //CanvasTools.DrawInfoText(canvas, "StaveFront", 4, 0, 15, 15);
+              CanvasTools.DrawStaveFront(canvas, paperWidth * 0.5f, margins, barrel.BarrelDetails!, (StaveFrontConfigDetail)config);
               break;
           }
 
@@ -215,104 +212,3 @@ namespace SuperAniki.Laggen.Services
     }
   }
 }
-
-
-/*
-    public static MemoryStream DrawErrorMessage(FontCollection fonts, string message)
-    {
-      int width = 640;
-      int height = 480;
-      using (Image<Rgba32> image = new(width, height))
-      {
-        if (fonts.TryGet("Liberation Mono", out FontFamily family))
-        {
-          Font font = family.CreateFont(12, FontStyle.Italic);
-          image.Mutate(x => x.DrawText(message, font, Color.Black, new PointF(10, 10)));
-        }
-
-        MemoryStream memoryStream = new();
-        image.SaveAsPng(memoryStream);
-        memoryStream.Seek(0, SeekOrigin.Begin);
-        return memoryStream;
-      }
-    }
-
-
-    public static MemoryStream DrawStar()
-    {
-      int width = 640;
-      int height = 480;
-      using (Image<Rgba32> image = new(width, height))
-      {
-        Star star = new(x: width / 2, y: height / 2, prongs: 5, innerRadii: 15.0f, outerRadii: 30.0f, 0.5f);
-        image.Mutate(x => x.Fill(Color.Red, star)); // fill the star with red
-
-        MemoryStream memoryStream = new();
-        image.SaveAsPng(memoryStream);
-        memoryStream.Seek(0, SeekOrigin.Begin);
-        return memoryStream;
-      }
-    }
-
-public static MemoryStream? DrawPaper_SkiaSharp(BarrelForPrintouts barrel, float scale, ILogger logger)
-{
-// Define the image dimensions
-int width = 800;
-int height = 600;
-
-//  try
-//  {
-// Create an empty bitmap with the specified dimensions
-using (var bitmap = new SKBitmap(width, height))
-{
-// Create a canvas to draw on the bitmap
-using (var canvas = new SKCanvas(bitmap))
-{
-  // Set the background color
-  canvas.Clear(SKColors.White);
-
-  // Draw a rectangle
-  var paint = new SKPaint
-  {
-    Color = SKColors.Blue,
-    IsAntialias = true,
-    Style = SKPaintStyle.Stroke,
-    StrokeWidth = 3
-  };
-
-  canvas.DrawRect(new SKRect(100, 100, 700, 500), paint);
-
-  // Draw a circle
-  paint.Color = SKColors.Red;
-  canvas.DrawCircle(400, 300, 100, paint);
-
-  // Draw some text
-  paint.Color = SKColors.Green;
-  paint.TextSize = 50;
-  canvas.DrawText("Hello SkiaSharp", 200, 100, paint);
-
-  // Draw a line
-  paint.Color = SKColors.Black;
-  canvas.DrawLine(100, 100, 700, 500, paint);
-}
-
-// Save the bitmap as a PNG file
-using (var image = SKImage.FromBitmap(bitmap))
-using (var data = image.Encode(SKEncodedImageFormat.Png, 100))
-{
-  MemoryStream memoryStream = new();
-  data.SaveTo(memoryStream);
-  memoryStream.Seek(0, SeekOrigin.Begin); // Reset the stream position to the beginning
-  return memoryStream;
-
-
-    // using (var fileStream = new FileStream("output.png", FileMode.Create, FileAccess.Write))
-    // {
-    //   memoryStream.CopyTo(fileStream);
-    // }
-
-}
-}
-
-
-*/

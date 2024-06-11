@@ -61,6 +61,24 @@ namespace SuperAniki.Laggen.Utilities
       return FindDiameter(diameter, adjustedEndPoints[0], adjustedEndPoints[1]);
     }
 
+    /*function reversePairs(arr: number[])
+    {
+      return arr.map((_, i) => arr[arr.length - i - 2 * (1 - (i % 2))]);
+    }*/
+
+    public static double[] ReversePairs(double[] arr)
+    {
+      double[] result = new double[arr.Length];
+
+      for (int i = 0; i < arr.Length; i++)
+      {
+        result[i] = arr[(int)(arr.Length - i - 2 * (1 - (i % 2)))];
+      }
+
+      return result;
+    }
+
+
     public static double[] CreateCurveMaxWidth(double diameter, int min, int max, double maxStaveWidth = 999999)
     {
       double radius = diameter * 0.5;

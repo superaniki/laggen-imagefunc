@@ -81,13 +81,8 @@ namespace SuperAniki.Laggen.Utilities
 
         public static void DrawBarrelSide(SKCanvas canvas, float x, float y, BarrelDetails barrelDetails, float scale)
         {
-            var angle = barrelDetails.Angle;
-            var height = barrelDetails.Height;
-            var bottomDiameter = barrelDetails.BottomDiameter;
-            var staveTopThickness = barrelDetails.StaveTopThickness;
-            var staveBottomThickness = barrelDetails.StaveBottomThickness;
-            var bottomThickness = barrelDetails.BottomThickness;
-            var bottomMargin = barrelDetails.BottomMargin;
+            var (height, angle, bottomDiameter, staveBottomThickness, staveTopThickness, bottomThickness, bottomMargin) = barrelDetails;
+
 
             var tan = (float)Math.Tan(angle * Math.PI / 180);
             var length = tan * height; // position till motsatt sida av vinkeln
@@ -120,10 +115,106 @@ namespace SuperAniki.Laggen.Utilities
         }
 
 
-        public static void DrawStaveEnds(SKCanvas canvas, float x, float y, BarrelDetails barrelDetails, StaveEndConfigDetail config, string paperType)
+        public static void DrawStaveEnds(SKCanvas canvas, float x, float y, BarrelDetails barrelDetails, StaveEndConfigDetail config)
         {
             DrawInfoText(canvas, "Test test DrawStaveEnds", 4, 45, 15, 15);
+
+            var (height, angle, bottomDiameter, staveBottomThickness, staveTopThickness, _, _) = barrelDetails;
+
+            double tan = Math.Tan((angle * Math.PI) / 180);
+            double length = tan * height; // position till motsatt sida av vinkeln
+            double topOuterDiameter = length * 2 + bottomDiameter;
+            double bottomOuterDiameter = bottomDiameter;
+
+            double adjustedBottomOuterDiameter = BarrelMath.FindAdjustedDiameter(bottomOuterDiameter, angle);
+            double adjustedBottomInnerDiameter = adjustedBottomOuterDiameter - staveBottomThickness * 2;
+            double adjustedTopOuterDiameter = BarrelMath.FindAdjustedDiameter(topOuterDiameter, angle);
+            double adjustedTopInnerDiameter = adjustedTopOuterDiameter - staveTopThickness * 2;
+
+            double[] bottomPoints = BarrelMath.CreateCurveForStaveEnds(adjustedBottomInnerDiameter, 90, 270, staveBottomThickness);
+            double[] bottomEndPoints = [.. BarrelMath.CreateCurveForStaveEnds(adjustedBottomOuterDiameter, 90, 270, 0), .. BarrelMath.ReversePairs(bottomPoints)];
+            double[] topPoints = BarrelMath.CreateCurveForStaveEnds(adjustedTopInnerDiameter, 90, 270, staveTopThickness);
+            double[] topEndPoints = [.. BarrelMath.CreateCurveForStaveEnds(adjustedTopOuterDiameter, 90, 270, 0), .. BarrelMath.ReversePairs(topPoints)];
+
+
+
+
+            canvas.Save();
+            canvas.Translate((float)x, (float)y);
+            DrawPath(canvas, 0, config.TopEndY, topEndPoints, closedPath: true);
+            DrawPath(canvas, 0, config.BottomEndY, bottomEndPoints, closedPath: true);
+
+            using (var textPaint = new SKPaint { Color = SKColors.Black, TextSize = 6 * 96.0f / 72.0f })
+            {
+                canvas.DrawText("Top Ends", 4.5f, (float)config.TopEndY - 4, textPaint);
+                canvas.DrawText("Bottom Ends", 4.5f, (float)config.BottomEndY - 4, textPaint);
+            }
+
+            canvas.Restore();
+
+
+
+            /*
+
+            ctx.fillStyle = 'black';
+            ctx.font = "6pt 'Liberation'";
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = 'black';
+
+            ctx.save();
+            ctx.translate(x, y);
+            drawPath(ctx, 0, configDetails.topEndY, topEndPoints, true);
+            ctx.fillText('Top Ends', 4.5, configDetails.topEndY - 4);
+            drawPath(ctx, 0, configDetails.bottomEndY, bottomEndPoints, true);
+            ctx.fillText('Bottom Ends', 4.5, configDetails.bottomEndY - 4);
+            ctx.restore();
+            */
+
         }
+
+
+
+        /*
+const { angle, height, bottomDiameter, staveBottomThickness, staveTopThickness } = { ...barrelDetails };
+const configDetailsArray = config.configDetails;
+
+const configDetails = configDetailsArray.find((item) => item.paperType === paperState);
+if (configDetails === undefined) return ctx;
+
+const tan = Math.tan((angle * Math.PI) / 180);
+const length = tan * height; // position till motsatt sida av vinkeln
+const topOuterDiameter = length * 2 + bottomDiameter;
+const bottomOuterDiameter = bottomDiameter;
+
+const adjustedBottomOuterDiameter = findAdjustedDiameter(bottomOuterDiameter, angle);
+const adjustedBottomInnerDiameter = adjustedBottomOuterDiameter - staveBottomThickness * 2;
+const adjustedTopOuterDiameter = findAdjustedDiameter(topOuterDiameter, angle);
+const adjustedTopInnerDiameter = adjustedTopOuterDiameter - staveTopThickness * 2;
+
+const bottomPoints = createCurveForStaveEnds(adjustedBottomInnerDiameter, 90, 270, staveBottomThickness);
+const bottomEndPoints = [
+    ...createCurveForStaveEnds(adjustedBottomOuterDiameter, 90, 270, 0),
+    ...reversePairs(bottomPoints),
+];
+
+const topPoints = createCurveForStaveEnds(adjustedTopInnerDiameter, 90, 270, staveTopThickness);
+const topEndPoints = [...createCurveForStaveEnds(adjustedTopOuterDiameter, 90, 270, 0), ...reversePairs(topPoints)];
+
+ctx.fillStyle = 'black';
+ctx.font = "6pt 'Liberation'";
+ctx.lineWidth = 4;
+ctx.strokeStyle = 'black';
+
+ctx.save();
+ctx.translate(x, y);
+drawPath(ctx, 0, configDetails.topEndY, topEndPoints, true);
+ctx.fillText('Top Ends', 4.5, configDetails.topEndY - 4);
+drawPath(ctx, 0, configDetails.bottomEndY, bottomEndPoints, true);
+ctx.fillText('Bottom Ends', 4.5, configDetails.bottomEndY - 4);
+ctx.restore();
+
+        */
+
 
 
         public class TextData
@@ -171,10 +262,10 @@ namespace SuperAniki.Laggen.Utilities
             }
         }
 
-        public static void DrawStaveCurve(SKCanvas canvas, BarrelDetails barrelDetails, StaveCurveConfigDetail config, string paperType)
+        public static void DrawStaveCurve(SKCanvas canvas, BarrelDetails barrelDetails, StaveCurveConfigDetail config)
         {
             DrawInfoText(canvas, "Test test DrawStaveCurve", 4, 45, 15, 15);
-            var (height, angle, bottomDiameter, staveBottomThickness, staveTopThickness) = barrelDetails;
+            var (height, angle, bottomDiameter, staveBottomThickness, staveTopThickness, _, _) = barrelDetails;
             var (posX, posY, innerTopY, outerTopY, innerBottomY, outerBottomY, rectX, rectY, rectWidth, rectHeight) = config;
 
 
@@ -213,7 +304,7 @@ namespace SuperAniki.Laggen.Utilities
         }
 
 
-        public static void DrawStaveFront(SKCanvas canvas, float x, float y, BarrelDetails barrelDetails, StaveFrontConfigDetail config, string paperType)
+        public static void DrawStaveFront(SKCanvas canvas, float x, float y, BarrelDetails barrelDetails, StaveFrontConfigDetail config)
         {
             DrawInfoText(canvas, "DrawStaveFront", 4, 45, 15, 15);
 
